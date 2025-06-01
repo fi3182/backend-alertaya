@@ -38,7 +38,7 @@ const register = async (req, res) => {
       if (err2) return res.status(500).json({ error: 'Error al registrar usuario.' });
 
       // Enviar correo de verificación
-      const enlace = `https://https://backend-alertaya-production.up.railway.app/api/auth/verify-email?token=${token}`;
+      const enlace = `${process.env.APP_BASE_URL}/api/auth/verify-email?token=${token}`;
 
       transporter.sendMail({
         from: '"Alertaya" <tucorreo@gmail.com>',
