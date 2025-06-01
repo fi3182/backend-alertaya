@@ -12,6 +12,7 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+// Registrar
 const register = async (req, res) => {
     const { nombre, email, password } = req.body;
 
@@ -60,6 +61,7 @@ const register = async (req, res) => {
     });
 };
 
+// Email
 const verifyEmail = (req, res) => {
     const token = req.query.token;
 
@@ -80,4 +82,45 @@ const verifyEmail = (req, res) => {
     });
 };
 
-module.exports = { register, verifyEmail };
+// Login
+const login = (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.status(400).json({ error: 'Correo y contraseña son obligatorios.' });
+    }
+
+    db.query('SELECT * FROM usuarios WHERE email = ?', [email], async (err, resultados) => {
+        if (err) return res.status(500).json({ error: 'Error al buscar el usuario.' });
+
+        if (resultados.length === 0) {
+            return res.status(401).json({ error: 'Correo o contraseña inválidos.' });
+        }
+
+        const usuario = resultados[0];
+
+        // Verificar contraseña
+        const passwordCorrecta = await bcrypt.compare(password, usuario.password);
+        if (!passwordCorrecta) {
+            return res.status(401).json({ error: 'Correo o contraseña inválidos.' });
+        }
+
+        // Verificar si está activado
+        if (!usuario.verificado) {
+            return res.status(403).json({ error: 'Tu cuenta aún no está verificada.' });
+        }
+
+        // Login exitoso
+        res.status(200).json({
+            mensaje: 'Inicio de sesión exitoso',
+            usuario: {
+                id: usuario.id,
+                nombre: usuario.nombre,
+                email: usuario.email
+            }
+        });
+    });
+};
+
+
+module.exports = { register, verifyEmail, login };
