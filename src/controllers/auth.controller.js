@@ -80,5 +80,4 @@ const verifyEmail = (req, res) => {
     });
 };
 
-
 module.exports = { register, verifyEmail };
