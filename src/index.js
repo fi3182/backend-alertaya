@@ -6,9 +6,9 @@ const app = express();
 
 // ✅ Middleware de seguridad y formato JSON
 app.use(cors({
-  origin: '*',
+  origin: '*', // o especifica el frontend: 'http://localhost:8100'
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type']
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 
