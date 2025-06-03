@@ -110,7 +110,7 @@ const login = (req, res) => {
 
         // Verificar si está activado
         if (!usuario.verificado) {
-            return res.status(403).json({ error: 'Tu cuenta aún no está verificada.' });
+            return res.status(403).json({ error: 'Tu cuenta aún no está verificada, revisa tu correo.' });
         }
 
         // Login exitoso
