@@ -111,7 +111,7 @@ const crearReporte = (req, res) => {
   });
 };
 
-exports.getMisReportes = (req, res) => {
+const getMisReportes = (req, res) => {
   const token = req.headers.authorization?.split(' ')[1];
 
   if (!token) {
@@ -141,4 +141,5 @@ exports.getMisReportes = (req, res) => {
 module.exports = {
   getReportes,
   crearReporte,
+  getMisReportes
 };
