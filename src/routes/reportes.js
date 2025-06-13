@@ -10,6 +10,8 @@ router.get('/', getReportes);
 router.post('/', verifyToken, crearReporte);
 // para obtener reportes por usuario usando el token 
 router.get('/mios', verifyToken, getMisReportes);
+// obtener un solo reporte 
+router.get('/:id', getReportePorId); 
 // eliminar reportes del backend 
 router.delete('/:id', verifyToken, eliminarReporte);
 
