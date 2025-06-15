@@ -3,7 +3,8 @@ const router = express.Router();
 const { valorarReporte, obtenerResumenValoraciones } = require('../controllers/valoraciones.controller');
 const verifyToken = require('../middlewares/auth.middleware');
 
-router.post('/', verifyToken, valorarReporte);
+router.post('/:id', verifyToken, valorarReporte);
+router.get('/usuario/:id', verifyToken, obtenerValoracionUsuario);
 router.get('/:id', obtenerResumenValoraciones);
 
 module.exports = router;
