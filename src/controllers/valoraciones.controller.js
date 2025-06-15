@@ -77,4 +77,4 @@ const obtenerResumenValoraciones = (req, res) => {
   });
 };
 
-module.exports = { valorarReporte, obtenerResumenValoraciones };
+module.exports = { valorarReporte, obtenerResumenValoraciones, obtenerValoracionUsuario };
