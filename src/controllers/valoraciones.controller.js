@@ -40,20 +40,24 @@ const valorarReporte = (req, res) => {
 
 // obtener valoracion de usuario 
 const obtenerValoracionUsuario = (req, res) => {
-  const { id } = req.params; // reporteId
-  const usuarioId = req.usuario?.id;
+  const reporteId = req.params.id;
+  const usuarioId = req.usuario.id;
 
-  const sql = 'SELECT util FROM valoraciones WHERE reporteId = ? AND usuarioId = ?';
-  db.query(sql, [id, usuarioId], (err, resultados) => {
-    if (err) return res.status(500).json({ error: 'Error al consultar valoración' });
+  const sql = 'SELECT * FROM valoraciones WHERE reporteId = ? AND usuarioId = ?';
+  db.query(sql, [reporteId, usuarioId], (err, resultados) => {
+    if (err) {
+      console.error('Error al obtener valoración:', err);
+      return res.status(500).json({ error: 'Error al obtener valoración' });
+    }
 
     if (resultados.length > 0) {
-      return res.json({ valorado: true, util: resultados[0].util });
+      res.json({ valoracion: resultados[0].valor });
     } else {
-      return res.json({ valorado: false });
+      res.json({ valoracion: null });
     }
   });
 };
+
 
 
 // Obtener resumen de valoraciones para un reporte
