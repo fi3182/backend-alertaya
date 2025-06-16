@@ -40,23 +40,24 @@ const valorarReporte = (req, res) => {
 
 // obtener valoracion de usuario 
 const obtenerValoracionUsuario = (req, res) => {
-  const usuarioId = req.usuario?.id;
-  const reporteId = parseInt(req.params.id);
+  const userId = req.user?.id;
+  const reporteId = req.params.reporteId;
 
-  if (!usuarioId || isNaN(reporteId)) {
-    return res.status(400).json({ error: 'Datos inválidos.' });
+  if (!userId || !reporteId) {
+    return res.status(400).json({ error: 'Datos inválidos' });
   }
 
-  const sql = 'SELECT util FROM valoraciones WHERE usuarioId = ? AND reporteId = ?';
-  db.query(sql, [usuarioId, reporteId], (err, results) => {
-    if (err) return res.status(500).json({ error: 'Error al consultar valoración.' });
-    if (results.length > 0) {
-      return res.json({ valorado: true, util: results[0].util === 1 });
-    } else {
-      return res.json({ valorado: false });
+  db.query(
+    'SELECT * FROM valoraciones WHERE idUsuario = ? AND idReporte = ?',
+    [userId, reporteId],
+    (err, resultados) => {
+      if (err) return res.status(500).json({ error: 'Error al obtener valoración' });
+      if (resultados.length === 0) return res.json({ valorado: false });
+      res.json({ valorado: true, util: resultados[0].util });
     }
-  });
+  );
 };
+
 
 
 
