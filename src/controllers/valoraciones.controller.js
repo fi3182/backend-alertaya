@@ -2,65 +2,46 @@ const db = require('../config/db');
 
 // Crear o actualizar una valoración
 const valorarReporte = (req, res) => {
-  const { id } = req.params; // ID del reporte
-  const { util } = req.body; // true o false
-  const usuarioId = req.usuario?.id;
+  const usuarioEmail = req.user?.email;
+  const reporteId = req.params.id;
+  const { utilidad } = req.body; // tiene que venir como 'util' o 'no_util'
 
-  if (!usuarioId) return res.status(401).json({ error: 'Usuario no autenticado' });
+  if (!usuarioEmail || !reporteId || !['util', 'no_util'].includes(utilidad)) {
+    return res.status(400).json({ error: 'Datos inválidos' });
+  }
 
-  const buscarSql = 'SELECT * FROM valoraciones WHERE reporteId = ? AND usuarioId = ?';
-  db.query(buscarSql, [id, usuarioId], (err, resultados) => {
-    if (err) return res.status(500).json({ error: 'Error en BD' });
+  const sql = `
+    INSERT INTO valoraciones (reporte_id, usuario_email, utilidad)
+    VALUES (?, ?, ?)
+    ON DUPLICATE KEY UPDATE utilidad = VALUES(utilidad)
+  `;
 
-    if (resultados.length > 0) {
-      const valoracionActual = resultados[0];
-      if (valoracionActual.util === util) {
-        // Desmarcar valoración
-        db.query('DELETE FROM valoraciones WHERE id = ?', [valoracionActual.id], (err2) => {
-          if (err2) return res.status(500).json({ error: 'Error al eliminar valoración' });
-          return res.json({ mensaje: 'Valoración eliminada' });
-        });
-      } else {
-        // Actualizar valoración
-        db.query('UPDATE valoraciones SET util = ? WHERE id = ?', [util, valoracionActual.id], (err3) => {
-          if (err3) return res.status(500).json({ error: 'Error al actualizar valoración' });
-          return res.json({ mensaje: 'Valoración actualizada' });
-        });
-      }
-    } else {
-      // Insertar nueva valoración
-      const insertSql = 'INSERT INTO valoraciones (usuarioId, reporteId, util) VALUES (?, ?, ?)';
-      db.query(insertSql, [usuarioId, id, util], (err4) => {
-        if (err4) return res.status(500).json({ error: 'Error al insertar valoración' });
-        return res.json({ mensaje: 'Valoración registrada' });
-      });
-    }
+  db.query(sql, [reporteId, usuarioEmail, utilidad], (err) => {
+    if (err) return res.status(500).json({ error: 'Error al registrar valoración' });
+    res.status(200).json({ mensaje: 'Valoración registrada' });
   });
 };
 
+
 // obtener valoracion de usuario 
 const obtenerValoracionUsuario = (req, res) => {
-  const userId = req.user?.id;
+  const userEmail = req.user?.email;  // Email en lugar de id
   const reporteId = req.params.reporteId;
 
-  if (!userId || !reporteId) {
+  if (!userEmail || !reporteId) {
     return res.status(400).json({ error: 'Datos inválidos' });
   }
 
   db.query(
-    'SELECT * FROM valoraciones WHERE usuarioId = ? AND reporteId = ?',
-    [userId, reporteId],
+    'SELECT * FROM valoraciones WHERE reporte_id = ? AND usuario_email = ?',
+    [reporteId, userEmail],
     (err, resultados) => {
       if (err) return res.status(500).json({ error: 'Error al obtener valoración' });
       if (resultados.length === 0) return res.json({ valorado: false });
-      res.json({ valorado: true, util: resultados[0].util });
+      res.json({ valorado: true, util: resultados[0].utilidad }); // cuidado: es 'utilidad'
     }
   );
 };
-
-
-
-
 
 
 // Obtener resumen de valoraciones para un reporte
