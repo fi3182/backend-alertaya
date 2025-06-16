@@ -48,7 +48,7 @@ const obtenerValoracionUsuario = (req, res) => {
   }
 
   db.query(
-    'SELECT * FROM valoraciones WHERE idUsuario = ? AND idReporte = ?',
+    'SELECT * FROM valoraciones WHERE usuarioId = ? AND reporteId = ?',
     [userId, reporteId],
     (err, resultados) => {
       if (err) return res.status(500).json({ error: 'Error al obtener valoración' });
@@ -57,6 +57,7 @@ const obtenerValoracionUsuario = (req, res) => {
     }
   );
 };
+
 
 
 
